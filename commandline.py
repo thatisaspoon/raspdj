@@ -5,18 +5,30 @@ import spotipy
 import spotipy.util
 
 # Scopes as defined in the Spotify API
-scope = 'user-library-read user-modify-playback-state user-read-currently-playing user-read-playback-state user-read-private'
+SCOPE = 'user-library-read user-modify-playback-state'
+SCOPE += ' user-read-currently-playing user-read-playback-state user-read-private'
 
-def play_pause():
+
+def pause():
+    """ Pauses playback if not paused """
     playing = sp.currently_playing().get('is_playing')
     if playing:
         sp.pause_playback()
         print('Paused')
     else:
+        print('Already paused')
+
+def play():
+    """ Starts playback if not already started """
+    playing = sp.currently_playing().get('is_playing')
+    if not playing:
         sp.start_playback()
-        print("Playing")
+        print('Playing')
+    else:
+        print('Already playing')
 
 def song_info():
+    """ Prints out info about the current song """
     track = sp.currently_playing().get('item')
     if track:
         name = track.get('name')
@@ -28,10 +40,10 @@ def song_info():
         
         print("{0} by {1}".format(name, ', '.join(artists)))
     else:
-        print("No track is playing")
+        print('No track is playing')
 
 def main_loop():
-    print('henlo')
+    """ Loops for user input """
 
     while True:
         cmd = input("").lower()
@@ -54,10 +66,10 @@ def main_loop():
             song_info()
 
         elif cmd == "pause":
-            play_pause()
+            pause()
 
         elif cmd == "play":
-            play_pause()
+            play()
 
         # Info controls
         elif cmd == "song":
@@ -71,10 +83,10 @@ def main_loop():
 # Set to a constant since it's really only me using this atm
 username = 'thatisaspoon'
 
-token = spotipy.util.prompt_for_user_token(username, scope)
+TOKEN = spotipy.util.prompt_for_user_token(username, SCOPE)
 
-if token:
-    sp = spotipy.Spotify(auth=token)
+if TOKEN:
+    sp = spotipy.Spotify(auth=TOKEN)
     user = sp.current_user()
     print("Obtained token for {0}".format(username,))
     main_loop()
